@@ -1,0 +1,56 @@
+<form [formGroup]="convertForm" autocomplete="off" (ngSubmit)="calcuate()">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-5">
+                <div class="form-group">
+                    <label>Віддаю</label>
+                    <select class="form-control" formControlName="giveMoney"
+                        (change)="onChangeGiveMoney($event.target)">
+                        <option *ngFor="let recipient of giveMoneyCurrencies | keyvalue" value="{{recipient.key}}">
+                            {{recipient.key}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-2 d-flex justify-content-center align-items-end">
+                <button type="button" class="btn btn-warning" (click)="reveseCurrency()">
+                    &lt;--&gt;
+                </button>
+            </div>
+            <div class="col-lg-5">
+                <div class="form-group">
+                    <label>Отримую</label>
+                    <select class="form-control" formControlName="takeMoney">
+                        <option *ngFor="let recipient of takeMoneyCurrencies | keyvalue" value="{{recipient.key}}">
+                            {{recipient.key}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label>Потрібно обміняти </label>
+                    <input type="text" class="form-control" formControlName="giveValue"
+                        (input)="disableInput($event.target, 'takeValue')">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label>Потрібно отримати </label>
+                    <input type="text" class="form-control" formControlName="takeValue"
+                        (input)="disableInput($event.target, 'giveValue')">
+                </div>
+            </div>
+        </div>
+        <div class="p-3">
+            <button class="btn btn-success" type="submit"
+                [disabled]="convertForm.invalid || convertForm.disabled">Порахувати</button>
+        </div>
+    </div>
+</form>
+
+<div class="result" *ngIf="result">
+    <div class="value">{{ result }}</div>
+</div>
