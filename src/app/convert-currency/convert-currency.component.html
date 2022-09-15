@@ -6,6 +6,7 @@
                     <label>Віддаю</label>
                     <select class="form-control" formControlName="giveMoney"
                         (change)="onChangeGiveMoney($event.target)">
+                        <option value="">Обери</option>
                         <option *ngFor="let recipient of giveMoneyCurrencies | keyvalue" value="{{recipient.key}}">
                             {{recipient.key}}
                         </option>
@@ -21,6 +22,7 @@
                 <div class="form-group">
                     <label>Отримую</label>
                     <select class="form-control" formControlName="takeMoney">
+                        <option value="">Обери</option>
                         <option *ngFor="let recipient of takeMoneyCurrencies | keyvalue" value="{{recipient.key}}">
                             {{recipient.key}}
                         </option>
@@ -52,5 +54,5 @@
 </form>
 
 <div class="result" *ngIf="result">
-    <div class="value">{{ result }}</div>
+    <div class="text-white p-4 bg-success">{{ result }}</div>
 </div>

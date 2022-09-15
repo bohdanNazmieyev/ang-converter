@@ -1,26 +1,24 @@
-<div class="container">
-    <div class="row">
-        <div class="col" *ngIf="this.loaded; else containerNoLoaded">
-            <div *ngIf="currencies.size; then listCurrentCurrencies else noData"></div>
-            <ng-template #listCurrentCurrencies>
-                <ul *ngFor="let recipient of currencies | keyvalue">
-                    <li>{{recipient.key}} --> {{recipient.value}}</li>
-                </ul>
-            </ng-template>
-            <ng-template #noData>
-                <div class="row">
-                    <div class="col">
-                        <h2>No data found</h2>
-                    </div>
-                </div>
-            </ng-template>
+<div *ngIf="this.loaded; else containerNoLoaded">
+    <div *ngIf="currencies.size; then listCurrentCurrencies else noData"></div>
+    <ng-template #listCurrentCurrencies>
+
+        <div class="text-left" *ngFor="let recipient of currencies | keyvalue">
+            {{recipient.key}}: {{recipient.value}}
         </div>
-        <ng-template #containerNoLoaded>
-            <div class="col text-center">
-                <div class="spinner-border" role="status">
-                    <span class="sr-only"></span>
-                </div>
-            </div>
-        </ng-template>
-    </div>
+
+    </ng-template>
+    <ng-template #noData>
+
+        <div>
+            <h2>No data found</h2>
+        </div>
+
+    </ng-template>
 </div>
+<ng-template #containerNoLoaded>
+
+    <div class="spinner-border" role="status">
+        <span class="sr-only"></span>
+    </div>
+
+</ng-template>

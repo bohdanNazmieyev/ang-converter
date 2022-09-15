@@ -8,6 +8,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ConvertCurrencyComponent } from './convert-currency/convert-currency.component';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ActionCurrencyService } from './shared/services/action-currency.service';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     FormsModule,
     ReactiveFormsModule
   ],
-  providers: [],
+  providers: [ActionCurrencyService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
