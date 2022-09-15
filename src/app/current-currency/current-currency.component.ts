@@ -8,18 +8,20 @@ import { ActionCurrencyService } from '../shared/services/action-currency.servic
 })
 
 export class CurrentCurrencyComponent implements OnInit {
-  loaded = true;
+  loaded = false;
   currencies: any;
 
   constructor(
     public currencyService: ActionCurrencyService
   ) {
+    currencyService.SharingData.subscribe((res: any) => {
+      this.currencies = res;
+      if(this.currencies.size) this.loaded = true;
+    })
   }
 
   ngOnInit(): void {
     this.currencyService.loadCurrencies();
-    this.currencies = this.currencyService.getCurrencies();
-    console.log('finish', this.currencies)
   }
 
 }

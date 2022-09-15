@@ -8,6 +8,7 @@ import { ActionCurrencyService } from '../shared/services/action-currency.servic
   styleUrls: ['./convert-currency.component.scss']
 })
 export class ConvertCurrencyComponent implements OnInit {
+  loaded = false;
   convertForm: FormGroup;
   allowedCurrencies: any;
   giveMoneyCurrencies = new Map();
@@ -20,6 +21,11 @@ export class ConvertCurrencyComponent implements OnInit {
     private fb: FormBuilder,
     public currencyService: ActionCurrencyService
   ) {
+    currencyService.SharingData.subscribe((res: any) => {
+      this.currencies = res;
+      if(this.currencies.size) this.loaded = true;
+    })
+
     this.getAllowedCurrencies();
     this.setMap(this.allowedCurrencies, this.giveMoneyCurrencies);
     this.setMap(this.allowedCurrencies, this.takeMoneyCurrencies);
@@ -37,48 +43,36 @@ export class ConvertCurrencyComponent implements OnInit {
 
   }
 
-  setMap(mapInstance: any, mapResult: any) {
+  setMap(mapInstance: Map<string, string>, mapResult: Map<string, string>): void {
     for (let [key, value] of mapInstance) {
       mapResult.set(key, value);
     }
   }
 
-  getAllowedCurrencies() {
+  getAllowedCurrencies(): void {
     this.allowedCurrencies = this.currencyService.allowedCurrencies;
   }
 
-  calcuate() {
-    this.currencies = this.currencyService.getCurrencies();
+  calcuate(): void{
+    let giveValue = this.convertForm.value.giveValue;
     let give = this.currencies.get(this.convertForm.value.giveMoney);
+    let take = this.currencies.get(this.convertForm.value.takeMoney);
+
     if (!give) {
       give = 1;
     }
-    let take = this.currencies.get(this.convertForm.value.takeMoney);
     if (!take) {
       take = 1;
     }
     if (give === 1) {
-      let giveValue = this.convertForm.value.giveValue;
-      if (giveValue) {
-        this.result = (giveValue / take).toFixed(2) + this.convertForm.value.takeMoney;
-      } else {
-        this.result = (this.convertForm.value.takeValue * take).toFixed(2) + this.convertForm.value.giveMoney;
-      }
-
+      this.calculateFromHrn(giveValue, take);
       return;
     }
     if (take === 1) {
-      let giveValue = this.convertForm.value.giveValue;
-      if (giveValue) {
-        this.result = (giveValue * give).toFixed(2) + this.convertForm.value.takeMoney;
-      } else {
-        this.result = (this.convertForm.value.takeValue / give).toFixed(2) + this.convertForm.value.giveMoney;
-      }
-
+      this.calculateToHrn(giveValue, give)
       return;
     }
 
-    let giveValue = this.convertForm.value.giveValue;
     if (giveValue) {
       this.result = ((giveValue * give) / take).toFixed(2) + this.convertForm.value.takeMoney;
     } else {
@@ -87,20 +81,37 @@ export class ConvertCurrencyComponent implements OnInit {
 
   }
 
-  onChangeGiveMoney(target: any) {
+  calculateFromHrn(giveValue: number, take: number): void{
+    if (giveValue) {
+      this.result = (giveValue / take).toFixed(2) + this.convertForm.value.takeMoney;
+    } else {
+      this.result = (this.convertForm.value.takeValue * take).toFixed(2) + this.convertForm.value.giveMoney;
+    }
+  }
+  calculateToHrn(giveValue: number, give: number): void{
+    if (giveValue) {
+      this.result = (giveValue * give).toFixed(2) + this.convertForm.value.takeMoney;
+    } else {
+      this.result = (this.convertForm.value.takeValue / give).toFixed(2) + this.convertForm.value.giveMoney;
+    }
+  }
+
+  onChangeGiveMoney(target: any): void {
     this.setMap(this.allowedCurrencies, this.takeMoneyCurrencies);
     this.takeMoneyCurrencies.delete(target.value);
   }
-  onChangeTakeMoney(target: any) {
+  onChangeTakeMoney(target: any): void {
     this.setMap(this.allowedCurrencies, this.giveMoneyCurrencies);
     this.giveMoneyCurrencies.delete(target.value);
   }
 
-  disableInput(target: any, field: string) {
+  disableInput(target: any, field: string): void {
     (target.value) ? this.convertForm.controls[field].disable() : this.convertForm.controls[field].enable();
+    this.result = null;
   }
 
-  reveseCurrency() {
+  reveseCurrency(): void {
+    this.result = null;
     let valueGiveMoney = this.convertForm.controls['giveMoney'].value;
     let valueTakeMoney = this.convertForm.controls['takeMoney'].value;
     if (valueGiveMoney && valueTakeMoney) {

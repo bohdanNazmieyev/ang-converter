@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { FreeApiCurrencyService } from './free-api-currency.service';
 
 @Injectable({
@@ -7,11 +8,11 @@ import { FreeApiCurrencyService } from './free-api-currency.service';
 export class ActionCurrencyService {
   private currentData: any;
   allowedCurrencies = new Map([
-    ['UAH', ''],
-    ['USD', ''],
-    ['EUR', '']
+    ['UAH', 'Гривна'],
+    ['USD', 'Долар'],
+    ['EUR', 'Євро']
   ]);
-  currencies = new Map();
+  SharingData = new BehaviorSubject(new Map());
 
   constructor(public apiService: FreeApiCurrencyService) {
     this.currentData = this.getCurrentData();
@@ -21,11 +22,11 @@ export class ActionCurrencyService {
     let json = this.getLocalCurrency();
 
     if (!json) {
-      console.log('loadCurrencies');
       this.apiService.getCurrency()
         .subscribe(
           result => {
             let promData = [result][0];
+            console.log('promData', promData)
             this.setLoadedCurrencies(promData);
             this.saveToLocalStorage();
           },
@@ -50,30 +51,35 @@ export class ActionCurrencyService {
   private setSavedCurrency(json: string | null): void {
     if (json) {
       const obj = JSON.parse(json);
-      this.currencies = new Map(Object.entries(obj));
-      console.log('this.currencies', this.currencies);
+      this.SharingData.next(new Map(Object.entries(obj)));
     } else {
       console.log('json = NULL');
     }
   }
 
   private setLoadedCurrencies(data: any[]): void {
+    let promMap = new Map();
     for (var prop in data) {
       let cc = data[prop].cc;
       let rate = data[prop].rate;
-      this.allowedCurrencies.has(cc) ? this.currencies.set(cc, rate) : '';
+      this.allowedCurrencies.has(cc) ? promMap.set(cc, rate) : '';
     }
+    this.SharingData.next(promMap);
   }
 
   private saveToLocalStorage(): void {
-    if (this.currentData && this.currencies.size) {
-      localStorage.setItem('currency_' + this.currentData, JSON.stringify(Object.fromEntries(this.currencies)));
-    } else {
-      console.log('this.currentData || this.currencies.size = false');
-    }
+    let currencies;
+    this.SharingData.subscribe(
+      res => {
+        currencies = res;
+        if (this.currentData && currencies.size) {
+          localStorage.setItem('currency_' + this.currentData, JSON.stringify(Object.fromEntries(currencies)));
+        } else {
+          console.log('this.currentData || this.currencies.size = false');
+        }
+      }
+    )
+
   }
 
-  public getCurrencies() {
-    return this.currencies;
-  }
 }
