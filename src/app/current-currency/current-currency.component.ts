@@ -16,8 +16,9 @@ export class CurrentCurrencyComponent implements OnInit {
   ) {
     currencyService.SharingData.subscribe((res: any) => {
       this.currencies = res;
-      if(this.currencies.size) this.loaded = true;
+      // if(this.currencies.size) this.loaded = true;
     })
+    currencyService.SharingLoaded.subscribe((res: boolean) => this.loaded = res)
   }
 
   ngOnInit(): void {

@@ -5,8 +5,8 @@
                 <div class="col-lg-5">
                     <div class="form-group">
                         <label>Віддаю</label>
-                        <select class="form-control" formControlName="giveMoney"
-                            (change)="onChangeGiveMoney($event.target)">
+                        <select class="form-control" formControlName="giveMoney" #giveMoney
+                            (change)="onChangeGiveMoney(giveMoney.value)">
                             <option value="">Обери</option>
                             <option *ngFor="let recipient of giveMoneyCurrencies | keyvalue" value="{{recipient.key}}">
                                 {{recipient.value}}
@@ -22,7 +22,8 @@
                 <div class="col-lg-5">
                     <div class="form-group">
                         <label>Отримую</label>
-                        <select class="form-control" formControlName="takeMoney">
+                        <select class="form-control" formControlName="takeMoney" #takeMoney
+                        (change)="onChangeTakeMoney(takeMoney.value)">
                             <option value="">Обери</option>
                             <option *ngFor="let recipient of takeMoneyCurrencies | keyvalue" value="{{recipient.key}}">
                                 {{recipient.value}}
@@ -36,7 +37,7 @@
                     <div class="form-group">
                         <label>Потрібно обміняти </label>
                         <input type="text" class="form-control" formControlName="giveValue"
-                            (input)="disableInput($event.target, 'takeValue')">
+                            (input)="disableInput(giveValue.value, 'takeValue')" #giveValue>
                     </div>
                 </div>
                 <div class="col-lg-2"></div>
@@ -44,7 +45,7 @@
                     <div class="form-group">
                         <label>Потрібно отримати </label>
                         <input type="text" class="form-control" formControlName="takeValue"
-                            (input)="disableInput($event.target, 'giveValue')">
+                            (input)="disableInput(takeValue.value, 'giveValue')" #takeValue>
                     </div>
                 </div>
             </div>

@@ -1,41 +1,47 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { NbuCurrencies } from '../interfaces/nbu-currencies.interface';
 import { FreeApiCurrencyService } from './free-api-currency.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ActionCurrencyService {
-  private currentData: any;
+  private currentData: string;
   allowedCurrencies = new Map([
     ['UAH', 'Гривна'],
     ['USD', 'Долар'],
     ['EUR', 'Євро']
   ]);
   SharingData = new BehaviorSubject(new Map());
+  SharingLoaded = new BehaviorSubject(false);
 
   constructor(public apiService: FreeApiCurrencyService) {
     this.currentData = this.getCurrentData();
   }
 
-  public loadCurrencies() {
+  public loadCurrencies(): void {
     let json = this.getLocalCurrency();
 
     if (!json) {
       this.apiService.getCurrency()
         .subscribe(
-          result => {
+          (result: NbuCurrencies[]) => {
             let promData = [result][0];
-            console.log('promData', promData)
             this.setLoadedCurrencies(promData);
             this.saveToLocalStorage();
           },
           error => {
-            console.log('error: ', error);
+            console.log('Loading error: ', error);
+          },
+          () => {
+            this.SharingLoaded.next(true);
+            console.log('Loading complete.')
           }
         )
     } else {
       this.setSavedCurrency(json);
+      this.SharingLoaded.next(true);
     }
   }
 
@@ -43,7 +49,7 @@ export class ActionCurrencyService {
     return localStorage.getItem('currency_' + this.currentData);
   }
 
-  private getCurrentData() {
+  private getCurrentData(): string {
     let date = new Date();
     return String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear();
   }
@@ -57,13 +63,13 @@ export class ActionCurrencyService {
     }
   }
 
-  private setLoadedCurrencies(data: any[]): void {
+  private setLoadedCurrencies(data: NbuCurrencies[]): void {
     let promMap = new Map();
-    for (var prop in data) {
-      let cc = data[prop].cc;
-      let rate = data[prop].rate;
-      this.allowedCurrencies.has(cc) ? promMap.set(cc, rate) : '';
-    }
+
+    data.map((row: NbuCurrencies) => {
+      this.allowedCurrencies.has(row.cc) ? promMap.set(row.cc, row.rate) : '';
+    })
+
     this.SharingData.next(promMap);
   }
 
@@ -72,14 +78,13 @@ export class ActionCurrencyService {
     this.SharingData.subscribe(
       res => {
         currencies = res;
-        if (this.currentData && currencies.size) {
-          localStorage.setItem('currency_' + this.currentData, JSON.stringify(Object.fromEntries(currencies)));
-        } else {
+        (this.currentData && currencies.size)
+          ?
+          localStorage.setItem('currency_' + this.currentData, JSON.stringify(Object.fromEntries(currencies)))
+          :
           console.log('this.currentData || this.currencies.size = false');
-        }
       }
     )
-
   }
 
 }

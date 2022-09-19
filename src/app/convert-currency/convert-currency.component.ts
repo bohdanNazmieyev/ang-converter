@@ -9,22 +9,22 @@ import { ActionCurrencyService } from '../shared/services/action-currency.servic
 })
 export class ConvertCurrencyComponent implements OnInit {
   loaded = false;
-  convertForm: FormGroup;
-  allowedCurrencies: any;
-  giveMoneyCurrencies = new Map();
-  takeMoneyCurrencies = new Map();
+  toFixed = 2;
 
-  currencies: any;
-  result: any;
+  convertForm: FormGroup;
+  allowedCurrencies: Map<string, string> = new Map();
+  giveMoneyCurrencies: Map<string, string> = new Map();
+  takeMoneyCurrencies: Map<string, string> = new Map();
+
+  currencies: Map<string, number> = new Map();
+  result = '';
 
   constructor(
     private fb: FormBuilder,
     public currencyService: ActionCurrencyService
   ) {
-    currencyService.SharingData.subscribe((res: any) => {
-      this.currencies = res;
-      if(this.currencies.size) this.loaded = true;
-    })
+    currencyService.SharingData.subscribe((res: Map<string, number>) => this.currencies = res)
+    currencyService.SharingLoaded.subscribe((res: boolean) => this.loaded = res)
 
     this.getAllowedCurrencies();
     this.setMap(this.allowedCurrencies, this.giveMoneyCurrencies);
@@ -39,9 +39,7 @@ export class ConvertCurrencyComponent implements OnInit {
     })
   }
 
-  ngOnInit(): void {
-
-  }
+  ngOnInit(): void { }
 
   setMap(mapInstance: Map<string, string>, mapResult: Map<string, string>): void {
     for (let [key, value] of mapInstance) {
@@ -53,7 +51,7 @@ export class ConvertCurrencyComponent implements OnInit {
     this.allowedCurrencies = this.currencyService.allowedCurrencies;
   }
 
-  calcuate(): void{
+  calcuate(): void {
     let giveValue = this.convertForm.value.giveValue;
     let give = this.currencies.get(this.convertForm.value.giveMoney);
     let take = this.currencies.get(this.convertForm.value.takeMoney);
@@ -65,53 +63,52 @@ export class ConvertCurrencyComponent implements OnInit {
       take = 1;
     }
     if (give === 1) {
-      this.calculateFromHrn(giveValue, take);
+      this.result = this.calculateFromHrn(giveValue, take);
       return;
     }
     if (take === 1) {
-      this.calculateToHrn(giveValue, give)
+      this.result = this.calculateToHrn(giveValue, give);
       return;
     }
 
-    if (giveValue) {
-      this.result = ((giveValue * give) / take).toFixed(2) + this.convertForm.value.takeMoney;
-    } else {
-      this.result = ((this.convertForm.value.takeValue * take) / give).toFixed(2) + this.convertForm.value.giveMoney;
-    }
-
+    this.result = this.calculateBesideHrn(giveValue, give, take);
   }
 
-  calculateFromHrn(giveValue: number, take: number): void{
-    if (giveValue) {
-      this.result = (giveValue / take).toFixed(2) + this.convertForm.value.takeMoney;
-    } else {
-      this.result = (this.convertForm.value.takeValue * take).toFixed(2) + this.convertForm.value.giveMoney;
-    }
+  calculateFromHrn(giveValue: number, take: number): string {
+    return (giveValue) ?
+      (giveValue / take).toFixed(this.toFixed) + ' ' + this.convertForm.value.takeMoney
+      :
+      (this.convertForm.value.takeValue * take).toFixed(this.toFixed) + ' ' + this.convertForm.value.giveMoney
   }
-  calculateToHrn(giveValue: number, give: number): void{
-    if (giveValue) {
-      this.result = (giveValue * give).toFixed(2) + this.convertForm.value.takeMoney;
-    } else {
-      this.result = (this.convertForm.value.takeValue / give).toFixed(2) + this.convertForm.value.giveMoney;
-    }
+  calculateToHrn(giveValue: number, give: number): string {
+    return (giveValue) ?
+      (giveValue * give).toFixed(this.toFixed) + ' ' + this.convertForm.value.takeMoney
+      :
+      (this.convertForm.value.takeValue / give).toFixed(this.toFixed) + ' ' + this.convertForm.value.giveMoney
+  }
+  calculateBesideHrn(giveValue: number, give: number, take: number): string {
+    return (giveValue) ?
+      ((giveValue * give) / take).toFixed(this.toFixed) + ' ' + this.convertForm.value.takeMoney
+      :
+      ((this.convertForm.value.takeValue * take) / give).toFixed(this.toFixed) + ' ' + this.convertForm.value.giveMoney
   }
 
-  onChangeGiveMoney(target: any): void {
+  onChangeGiveMoney(value: string): void {
     this.setMap(this.allowedCurrencies, this.takeMoneyCurrencies);
-    this.takeMoneyCurrencies.delete(target.value);
+    this.takeMoneyCurrencies.delete(value);
   }
-  onChangeTakeMoney(target: any): void {
+  onChangeTakeMoney(value: string): void {
     this.setMap(this.allowedCurrencies, this.giveMoneyCurrencies);
-    this.giveMoneyCurrencies.delete(target.value);
+    this.giveMoneyCurrencies.delete(value);
   }
 
-  disableInput(target: any, field: string): void {
-    (target.value) ? this.convertForm.controls[field].disable() : this.convertForm.controls[field].enable();
-    this.result = null;
+  disableInput(value: string, field: string): void {
+    (value) ? this.convertForm.controls[field].disable() : this.convertForm.controls[field].enable();
+    this.result = '';
   }
 
   reveseCurrency(): void {
-    this.result = null;
+    this.result = '';
     let valueGiveMoney = this.convertForm.controls['giveMoney'].value;
     let valueTakeMoney = this.convertForm.controls['takeMoney'].value;
     if (valueGiveMoney && valueTakeMoney) {
