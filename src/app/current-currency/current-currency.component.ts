@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ActionCurrencyService } from '../shared/services/action-currency.service';
 
 @Component({
@@ -7,22 +8,26 @@ import { ActionCurrencyService } from '../shared/services/action-currency.servic
   styleUrls: ['./current-currency.component.scss']
 })
 
-export class CurrentCurrencyComponent implements OnInit {
+export class CurrentCurrencyComponent implements OnInit, OnDestroy {
   loaded = false;
-  currencies: any;
+  currencies: Map<string, number> = new Map();
+  subscrnLoaded: Subscription;
+  subscrnData: Subscription;
 
   constructor(
     public currencyService: ActionCurrencyService
   ) {
-    currencyService.SharingData.subscribe((res: any) => {
-      this.currencies = res;
-      // if(this.currencies.size) this.loaded = true;
-    })
-    currencyService.SharingLoaded.subscribe((res: boolean) => this.loaded = res)
+    this.subscrnData = currencyService.SharingData.subscribe((res: Map<string, number>) => this.currencies = res);
+    this.subscrnLoaded = currencyService.SharingLoaded.subscribe((res: boolean) => this.loaded = res);
   }
 
   ngOnInit(): void {
     this.currencyService.loadCurrencies();
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscrnLoaded) this.subscrnLoaded.unsubscribe();
+    if (this.subscrnData) this.subscrnData.unsubscribe();
   }
 
 }

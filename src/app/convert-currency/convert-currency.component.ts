@@ -1,15 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActionCurrencyService } from '../shared/services/action-currency.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-convert-currency',
   templateUrl: './convert-currency.component.html',
   styleUrls: ['./convert-currency.component.scss']
 })
-export class ConvertCurrencyComponent implements OnInit {
+export class ConvertCurrencyComponent implements OnInit, OnDestroy {
   loaded = false;
   toFixed = 2;
+  subscrnLoaded: Subscription;
+  subscrnData: Subscription;
 
   convertForm: FormGroup;
   allowedCurrencies: Map<string, string> = new Map();
@@ -23,8 +26,8 @@ export class ConvertCurrencyComponent implements OnInit {
     private fb: FormBuilder,
     public currencyService: ActionCurrencyService
   ) {
-    currencyService.SharingData.subscribe((res: Map<string, number>) => this.currencies = res)
-    currencyService.SharingLoaded.subscribe((res: boolean) => this.loaded = res)
+    this.subscrnData = currencyService.SharingData.subscribe((res: Map<string, number>) => this.currencies = res)
+    this.subscrnLoaded = currencyService.SharingLoaded.subscribe((res: boolean) => this.loaded = res)
 
     this.getAllowedCurrencies();
     this.setMap(this.allowedCurrencies, this.giveMoneyCurrencies);
@@ -120,5 +123,10 @@ export class ConvertCurrencyComponent implements OnInit {
       this.convertForm.controls['giveMoney'].patchValue(valueTakeMoney);
       this.convertForm.controls['takeMoney'].patchValue(valueGiveMoney);
     }
+  }
+
+  ngOnDestroy(): void {
+    if(this.subscrnLoaded) this.subscrnLoaded.unsubscribe();
+    if(this.subscrnData) this.subscrnData.unsubscribe();
   }
 }
