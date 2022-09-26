@@ -20,6 +20,10 @@ export class ActionCurrencyService {
     this.currentData = this.getCurrentData();
   }
 
+  public getAllowedCurrencies() {
+    return this.allowedCurrencies;
+  }
+
   public loadCurrencies(): void {
     let json = this.getLocalCurrency();
 

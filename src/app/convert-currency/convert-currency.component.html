@@ -36,7 +36,7 @@
                 <div class="form-group">
                     <label class="d-flex flex-end">Потрібно обміняти </label>
                     <input type="text" class="form-control" formControlName="giveValue"
-                        (input)="disableInput(giveValue.value, 'takeValue')" #giveValue>
+                        (input)="actualInput(giveValue.value, 'takeValue')" #giveValue>
                 </div>
             </div>
             <div class="col-lg-2"></div>
@@ -44,7 +44,7 @@
                 <div class="form-group">
                     <label class="d-flex flex-end">Потрібно отримати </label>
                     <input type="text" class="form-control" formControlName="takeValue"
-                        (input)="disableInput(takeValue.value, 'giveValue')" #takeValue>
+                        (input)="actualInput(takeValue.value, 'giveValue')" #takeValue>
                 </div>
             </div>
         </div>

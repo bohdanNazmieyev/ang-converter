@@ -40,4 +40,12 @@ export class ActionConvertService {
     this.setResult(result);
   }
 
+  copyMap(mapInstance: Map<string, string>): Map<string, string> {
+    let mapResult = new Map();
+    for (let [key, value] of mapInstance) {
+      mapResult.set(key, value);
+    }
+    return mapResult;
+  }
+  
 }
