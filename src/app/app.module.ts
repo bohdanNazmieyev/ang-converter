@@ -9,12 +9,14 @@ import { ConvertCurrencyComponent } from './convert-currency/convert-currency.co
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActionCurrencyService } from './shared/services/action-currency.service';
+import { ConvertResultComponent } from './convert-result/convert-result.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     CurrentCurrencyComponent,
-    ConvertCurrencyComponent
+    ConvertCurrencyComponent,
+    ConvertResultComponent
   ],
   imports: [
     BrowserModule,

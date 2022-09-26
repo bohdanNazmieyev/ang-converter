@@ -1,68 +1,56 @@
-<div *ngIf="this.loaded; else containerNoLoaded">
-    <form [formGroup]="convertForm" autocomplete="off" (ngSubmit)="calcuate()">
-        <div class="container text-left">
-            <div class="row mb-3">
-                <div class="col-lg-5">
-                    <div class="form-group">
-                        <label>Віддаю</label>
-                        <select class="form-control" formControlName="giveMoney" #giveMoney
-                            (change)="onChangeGiveMoney(giveMoney.value)">
-                            <option value="">Обери</option>
-                            <option *ngFor="let recipient of giveMoneyCurrencies | keyvalue" value="{{recipient.key}}">
-                                {{recipient.value}}
-                            </option>
-                        </select>
-                    </div>
+<form [formGroup]="convertForm" autocomplete="off" (ngSubmit)="calcuate()">
+    <div class="container">
+        <div class="row mb-3">
+            <div class="col-lg-5">
+                <div class="form-group">
+                    <label class="d-flex flex-end">Віддаю</label>
+                    <select class="form-control" formControlName="giveMoney" #giveMoney
+                        (change)="onChangeGiveMoney(giveMoney.value)">
+                        <option value="">Обери</option>
+                        <option *ngFor="let recipient of giveMoneyCurrencies | keyvalue" value="{{recipient.key}}">
+                            {{recipient.value}}
+                        </option>
+                    </select>
                 </div>
-                <div class="col-lg-2 d-flex justify-content-center align-items-end">
-                    <button type="button" class="btn btn-warning" (click)="reveseCurrency()">
-                        &lt;--&gt;
-                    </button>
-                </div>
-                <div class="col-lg-5">
-                    <div class="form-group">
-                        <label>Отримую</label>
-                        <select class="form-control" formControlName="takeMoney" #takeMoney
+            </div>
+            <div class="col-lg-2 d-flex justify-content-center align-items-end">
+                <button type="button" class="btn btn-warning" (click)="reveseCurrency()">
+                    &lt;--&gt;
+                </button>
+            </div>
+            <div class="col-lg-5">
+                <div class="form-group">
+                    <label class="d-flex flex-end">Отримую</label>
+                    <select class="form-control" formControlName="takeMoney" #takeMoney
                         (change)="onChangeTakeMoney(takeMoney.value)">
-                            <option value="">Обери</option>
-                            <option *ngFor="let recipient of takeMoneyCurrencies | keyvalue" value="{{recipient.key}}">
-                                {{recipient.value}}
-                            </option>
-                        </select>
-                    </div>
+                        <option value="">Обери</option>
+                        <option *ngFor="let recipient of takeMoneyCurrencies | keyvalue" value="{{recipient.key}}">
+                            {{recipient.value}}
+                        </option>
+                    </select>
                 </div>
-            </div>
-            <div class="row mb-3">
-                <div class="col-lg-5">
-                    <div class="form-group">
-                        <label>Потрібно обміняти </label>
-                        <input type="text" class="form-control" formControlName="giveValue"
-                            (input)="disableInput(giveValue.value, 'takeValue')" #giveValue>
-                    </div>
-                </div>
-                <div class="col-lg-2"></div>
-                <div class="col-lg-5">
-                    <div class="form-group">
-                        <label>Потрібно отримати </label>
-                        <input type="text" class="form-control" formControlName="takeValue"
-                            (input)="disableInput(takeValue.value, 'giveValue')" #takeValue>
-                    </div>
-                </div>
-            </div>
-            <div class="mt-3 mb-3">
-                <button class="btn btn-success" type="submit"
-                    [disabled]="convertForm.invalid || convertForm.disabled">Порахувати</button>
             </div>
         </div>
-    </form>
-
-    <div class="result" *ngIf="result">
-        <div class="text-white p-4 bg-success">{{ result }}</div>
+        <div class="row mb-3">
+            <div class="col-lg-5">
+                <div class="form-group">
+                    <label class="d-flex flex-end">Потрібно обміняти </label>
+                    <input type="text" class="form-control" formControlName="giveValue"
+                        (input)="disableInput(giveValue.value, 'takeValue')" #giveValue>
+                </div>
+            </div>
+            <div class="col-lg-2"></div>
+            <div class="col-lg-5">
+                <div class="form-group">
+                    <label class="d-flex flex-end">Потрібно отримати </label>
+                    <input type="text" class="form-control" formControlName="takeValue"
+                        (input)="disableInput(takeValue.value, 'giveValue')" #takeValue>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3 mb-3">
+            <button class="btn btn-success" type="submit"
+                [disabled]="convertForm.invalid || convertForm.disabled">Порахувати</button>
+        </div>
     </div>
-
-</div>
-<ng-template #containerNoLoaded>
-    <div class="spinner-border" role="status">
-        <span class="sr-only"></span>
-    </div>
-</ng-template>
+</form>

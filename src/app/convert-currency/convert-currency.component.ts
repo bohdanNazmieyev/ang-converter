@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActionCurrencyService } from '../shared/services/action-currency.service';
 import { Subscription } from 'rxjs';
+import { ActionConvertService } from '../shared/services/action-convert.service';
 
 @Component({
   selector: 'app-convert-currency',
@@ -10,8 +11,7 @@ import { Subscription } from 'rxjs';
 })
 export class ConvertCurrencyComponent implements OnInit, OnDestroy {
   loaded = false;
-  toFixed = 2;
-  subscrnLoaded: Subscription;
+
   subscrnData: Subscription;
 
   convertForm: FormGroup;
@@ -20,14 +20,13 @@ export class ConvertCurrencyComponent implements OnInit, OnDestroy {
   takeMoneyCurrencies: Map<string, string> = new Map();
 
   currencies: Map<string, number> = new Map();
-  result = '';
 
   constructor(
     private fb: FormBuilder,
-    public currencyService: ActionCurrencyService
+    private currencyService: ActionCurrencyService,
+    private convertService: ActionConvertService
   ) {
     this.subscrnData = currencyService.SharingData.subscribe((res: Map<string, number>) => this.currencies = res)
-    this.subscrnLoaded = currencyService.SharingLoaded.subscribe((res: boolean) => this.loaded = res)
 
     this.getAllowedCurrencies();
     this.setMap(this.allowedCurrencies, this.giveMoneyCurrencies);
@@ -66,34 +65,15 @@ export class ConvertCurrencyComponent implements OnInit, OnDestroy {
       take = 1;
     }
     if (give === 1) {
-      this.result = this.calculateFromHrn(giveValue, take);
+      this.convertService.calculateFromHrn(giveValue, take, this.convertForm);
       return;
     }
     if (take === 1) {
-      this.result = this.calculateToHrn(giveValue, give);
+      this.convertService.calculateToHrn(giveValue, give, this.convertForm);
       return;
     }
 
-    this.result = this.calculateBesideHrn(giveValue, give, take);
-  }
-
-  calculateFromHrn(giveValue: number, take: number): string {
-    return (giveValue) ?
-      (giveValue / take).toFixed(this.toFixed) + ' ' + this.convertForm.value.takeMoney
-      :
-      (this.convertForm.value.takeValue * take).toFixed(this.toFixed) + ' ' + this.convertForm.value.giveMoney
-  }
-  calculateToHrn(giveValue: number, give: number): string {
-    return (giveValue) ?
-      (giveValue * give).toFixed(this.toFixed) + ' ' + this.convertForm.value.takeMoney
-      :
-      (this.convertForm.value.takeValue / give).toFixed(this.toFixed) + ' ' + this.convertForm.value.giveMoney
-  }
-  calculateBesideHrn(giveValue: number, give: number, take: number): string {
-    return (giveValue) ?
-      ((giveValue * give) / take).toFixed(this.toFixed) + ' ' + this.convertForm.value.takeMoney
-      :
-      ((this.convertForm.value.takeValue * take) / give).toFixed(this.toFixed) + ' ' + this.convertForm.value.giveMoney
+    this.convertService.calculateBesidesHrn(giveValue, give, take, this.convertForm);
   }
 
   onChangeGiveMoney(value: string): void {
@@ -107,11 +87,12 @@ export class ConvertCurrencyComponent implements OnInit, OnDestroy {
 
   disableInput(value: string, field: string): void {
     (value) ? this.convertForm.controls[field].disable() : this.convertForm.controls[field].enable();
-    this.result = '';
+    this.convertService.setResult('');
   }
 
   reveseCurrency(): void {
-    this.result = '';
+    this.convertService.setResult('');
+
     let valueGiveMoney = this.convertForm.controls['giveMoney'].value;
     let valueTakeMoney = this.convertForm.controls['takeMoney'].value;
     if (valueGiveMoney && valueTakeMoney) {
@@ -126,7 +107,6 @@ export class ConvertCurrencyComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if(this.subscrnLoaded) this.subscrnLoaded.unsubscribe();
-    if(this.subscrnData) this.subscrnData.unsubscribe();
+    if (this.subscrnData) this.subscrnData.unsubscribe();
   }
 }

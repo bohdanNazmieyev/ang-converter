@@ -1,31 +1,43 @@
-        <header class="masthead bg-primary text-white text-center">
-            <div class="container d-flex justify-content-between flex-row py-4">
-                <div>
-                    <h1 class="masthead-heading text-uppercase mb-0">{{ title }}</h1>
-                </div>
-                <div>
-                    <app-current-currency></app-current-currency>
-                </div>
+<ng-container *ngIf="this.loaded; else containerNoLoaded">
+    <header class="masthead bg-primary text-white text-center">
+        <div class="container d-flex justify-content-between flex-row py-4">
+            <div>
+                <h1 class="masthead-heading text-uppercase mb-0">{{ title }}</h1>
             </div>
-        </header>
-        
-        <!-- Contact Section-->
-        <section class="page-section" id="contact">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-8 col-xl-7 py-4 bg-light mt-5 text-center">
-                        <app-convert-currency></app-convert-currency>
+            <div>
+                <app-current-currency></app-current-currency>
+            </div>
+        </div>
+    </header>
+
+    <section class="page-section" id="contact">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-xl-7 py-4 bg-light mt-5 text-center">
+                    <app-convert-currency></app-convert-currency>
+                    <div class="container-result">
+                        <app-convert-result></app-convert-result>
                     </div>
                 </div>
             </div>
-        </section>
-        <!-- Footer-->
-        <footer class="footer text-center bg-primary">
-            <div class="container">
-                <div class="row">
-                    <div class="copyright py-4 text-right text-white">
-                        <div class="container"><small>Copyright &copy; Test 2022</small></div>
-                    </div>
+        </div>
+    </section>
+
+    <footer class="footer text-center bg-primary">
+        <div class="container">
+            <div class="row">
+                <div class="copyright py-4 text-right text-white">
+                    <div class="container"><small>Copyright &copy; Test 2022</small></div>
                 </div>
             </div>
-        </footer>
+        </div>
+    </footer>
+</ng-container>
+
+<ng-template #containerNoLoaded>
+    <div class="loading-container">
+        <div class="spinner-border" role="status">
+            <span class="sr-only"></span>
+        </div>
+    </div>
+</ng-template>
