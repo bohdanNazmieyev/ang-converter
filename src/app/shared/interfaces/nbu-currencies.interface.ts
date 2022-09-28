@@ -1,4 +1,4 @@
-export interface NbuCurrencies {
+export interface NbuCurrenciesInterface {
     r030: number;
     txt: string;
     rate: number;

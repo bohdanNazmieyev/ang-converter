@@ -1,4 +1,4 @@
-<ng-container *ngIf="this.loaded; else containerNoLoaded">
+<ng-container *ngIf="loadedStatus | async; else containerNoLoaded">
     <header class="masthead bg-primary text-white text-center">
         <div class="container d-flex justify-content-between flex-row py-4">
             <div>
@@ -14,7 +14,7 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-8 col-xl-7 py-4 bg-light mt-5 text-center">
-                    <app-convert-currency></app-convert-currency>
+                    <app-convert-currency [currencyMap]="currencyMap"></app-convert-currency>
                     <div class="container-result">
                         <app-convert-result></app-convert-result>
                     </div>

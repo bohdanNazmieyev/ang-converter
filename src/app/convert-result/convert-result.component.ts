@@ -1,25 +1,16 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { ActionConvertService } from '../shared/services/action-convert.service';
+import { Component } from '@angular/core';
+import { Observable } from 'rxjs';
+import { CurrencyService } from '../shared/services/currency.service';
 
 @Component({
   selector: 'app-convert-result',
-  template: `<strong>{{convertResult}}</strong>`
+  template: `<strong>{{result | async}}</strong>`
 })
-export class ConvertResultComponent implements OnInit, OnDestroy{
-  subscrnResult: Subscription;
-  convertResult = '';
+export class ConvertResultComponent{
+  result: Observable<string>;
 
-
-  constructor(public convertService: ActionConvertService) { 
-    this.subscrnResult = convertService.result.subscribe((result: string) => {this.convertResult = result});
-  }
-
-  ngOnInit(): void {
-  }
-
-  ngOnDestroy(): void {
-    this.subscrnResult.unsubscribe();
+  constructor(public currencyService: CurrencyService) { 
+    this.result = currencyService.result$;
   }
 
 }

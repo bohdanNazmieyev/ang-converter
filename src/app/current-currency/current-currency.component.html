@@ -1,13 +1,3 @@
-<div *ngIf="currencies.size; then listCurrentCurrencies else noData"></div>
-
-<ng-template #listCurrentCurrencies>
-    <div class="text-left" *ngFor="let recipient of currencies | keyvalue">
-        {{recipient.key}}: {{recipient.value}}
-    </div>
-</ng-template>
-
-<ng-template #noData>
-    <div>
-        <h2>No data found</h2>
-    </div>
-</ng-template>
+<div class="text-left" *ngFor="let recipient of currency | async | keyvalue ">
+    {{recipient.key}}: {{recipient.value}}
+</div>

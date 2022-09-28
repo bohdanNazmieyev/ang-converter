@@ -1,27 +1,49 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActionCurrencyService } from './shared/services/action-currency.service';
-import { debounce, delay, interval, Subscription } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { debounce, interval, Observable } from 'rxjs';
+import { CurrencyService } from './shared/services/currency.service';
+import { NbuApiService } from './shared/services/nbu-api.service';
+import { NbuCurrency } from './shared/models/nbu-currency.model';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit, OnDestroy{
+export class AppComponent implements OnInit {
   title = 'Тестовий калькулятор';
-  subscrnLoaded: Subscription;
-  loaded = false;
+  loadedStatus: Observable<boolean>;
+  currencyMap: Map<string, number> = new Map();
 
   constructor(
-    public currencyService: ActionCurrencyService
+    private apiService: NbuApiService,
+    private currencyService: CurrencyService
   ) {
-    this.subscrnLoaded = currencyService.SharingLoaded.pipe(debounce(i => interval(500))).subscribe((res: boolean) => {this.loaded = res})
+    this.loadedStatus = this.currencyService.loaded$.pipe(debounce(i => interval(500)));
   }
 
   ngOnInit(): void {
-    this.currencyService.loadCurrencies();
+    let dateToday = this.currencyService.getCurrentDate();
+    /* get from localStorage data */
+    let dataJson = localStorage.getItem('currency_' + dateToday);
+
+    if (!dataJson) {
+      /* load from API data */
+      this.apiService.loadCurrency().subscribe(
+          (result: NbuCurrency[]) => {
+            this.currencyMap = this.currencyService.setCurrencyMap(result);
+            localStorage.setItem('currency_' + dateToday, JSON.stringify(Object.fromEntries(this.currencyMap)));
+          },
+          error => {
+            console.log('Loading error: ', error);
+          },
+          () => {
+            this.currencyService.loaded$.next(true);
+          }
+        )
+    } else {
+      this.currencyMap = this.currencyService.setCurrencyMapJson(dataJson);
+      this.currencyService.loaded$.next(true);
+    }
   }
-  ngOnDestroy(): void{
-    if(this.subscrnLoaded) this.subscrnLoaded.unsubscribe();
-  }
+
 }
