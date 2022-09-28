@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { debounce, interval, Observable } from 'rxjs';
 import { CurrencyService } from './shared/services/currency.service';
 import { NbuApiService } from './shared/services/nbu-api.service';
-import { NbuCurrency } from './shared/models/nbu-currency.model';
+import { NbuCurrenciesInterface } from './shared/interfaces/nbu-currencies.interface';
 
 @Component({
   selector: 'app-root',
@@ -29,7 +29,7 @@ export class AppComponent implements OnInit {
     if (!dataJson) {
       /* load from API data */
       this.apiService.loadCurrency().subscribe(
-          (result: NbuCurrency[]) => {
+          (result: NbuCurrenciesInterface[]) => {
             this.currencyMap = this.currencyService.setCurrencyMap(result);
             localStorage.setItem('currency_' + dateToday, JSON.stringify(Object.fromEntries(this.currencyMap)));
           },
