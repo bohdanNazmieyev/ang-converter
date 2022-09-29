@@ -35,11 +35,10 @@ export class ConvertCurrencyComponent implements OnInit {
    }
 
   calcuate(): void {
-    let giveValue = this.convertForm.value.giveValue;
     let give = this.currencyMap.get(this.convertForm.value.giveMoney);
     let take = this.currencyMap.get(this.convertForm.value.takeMoney);
 
-    this.calculateFromTo(giveValue, take, give);
+    this.calculateFromTo(take, give);
   }
 
   onChangeGiveMoney(value: string): void {
@@ -75,37 +74,37 @@ export class ConvertCurrencyComponent implements OnInit {
     }
   }
 
-  calculateFromTo(giveValue = 0, take = 1, give = 1){
+  calculateFromTo(take = 1, give = 1){
     if (give === 1) {
-      this.calculateFromHrn(giveValue, take, this.convertForm);
+      this.calculateFromHrn(take, this.convertForm);
     } else if (take === 1) {
-      this.calculateToHrn(giveValue, give, this.convertForm);
+      this.calculateToHrn(give, this.convertForm);
     } else {
-      this.calculateBesidesHrn(giveValue, give, take, this.convertForm);
+      this.calculateBesidesHrn(give, take, this.convertForm);
     }
   }
   /* convertation from Hrivna to other currency */
-  calculateFromHrn(giveValue: number, take: number, convertForm: FormGroup): void {
-    let result = (giveValue) ?
-      (giveValue / take).toFixed(this.toFixed) + ' ' + convertForm.value.takeMoney
+  calculateFromHrn(take: number, convertForm: FormGroup): void {
+    let result = (this.convertForm.value.giveValue) ?
+      (this.convertForm.value.giveValue / take).toFixed(this.toFixed) + ' ' + convertForm.value.takeMoney
       :
       (convertForm.value.takeValue * take).toFixed(this.toFixed) + ' ' + convertForm.value.giveMoney
 
     this.currencyService.setResult(result);
   }
   /* convertation to Hrivna from other currency */
-  calculateToHrn(giveValue: number, give: number, convertForm: FormGroup): void {
-    let result = (giveValue) ?
-      (giveValue * give).toFixed(this.toFixed) + ' ' + convertForm.value.takeMoney
+  calculateToHrn(give: number, convertForm: FormGroup): void {
+    let result = (this.convertForm.value.giveValue) ?
+      (this.convertForm.value.giveValue * give).toFixed(this.toFixed) + ' ' + convertForm.value.takeMoney
       :
       (convertForm.value.takeValue / give).toFixed(this.toFixed) + ' ' + convertForm.value.giveMoney
 
     this.currencyService.setResult(result);
   }
   /* convertation from one currence to Hrivna and from Hrivna to second currency */
-  calculateBesidesHrn(giveValue: number, give: number, take: number, convertForm: FormGroup): void {
-    let result = (giveValue) ?
-      ((giveValue * give) / take).toFixed(this.toFixed) + ' ' + convertForm.value.takeMoney
+  calculateBesidesHrn(give: number, take: number, convertForm: FormGroup): void {
+    let result = (this.convertForm.value.giveValue) ?
+      ((this.convertForm.value.giveValue * give) / take).toFixed(this.toFixed) + ' ' + convertForm.value.takeMoney
       :
       ((convertForm.value.takeValue * take) / give).toFixed(this.toFixed) + ' ' + convertForm.value.giveMoney
 
