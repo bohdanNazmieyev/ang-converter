@@ -58,7 +58,7 @@ export class ConvertCurrencyComponent implements OnInit {
     this.currencyService.setResult('');
   }
 
-  /* button to conver both direction */
+  /* button to convertation both direction */
   reveseCurrency(): void {
     this.currencyService.setResult('');
 

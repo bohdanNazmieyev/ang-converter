@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { debounce, interval, Observable } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { debounce, interval, Observable, Subscription, tap } from 'rxjs';
 import { CurrencyService } from './shared/services/currency.service';
 import { NbuApiService } from './shared/services/nbu-api.service';
 import { NbuCurrenciesInterface } from './shared/interfaces/nbu-currencies.interface';
@@ -9,10 +9,11 @@ import { NbuCurrenciesInterface } from './shared/interfaces/nbu-currencies.inter
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'Тестовий калькулятор';
   loadedStatus: Observable<boolean>;
   currencyMap: Map<string, number> = new Map();
+  subscription: Subscription;
 
   constructor(
     private apiService: NbuApiService,
@@ -28,7 +29,10 @@ export class AppComponent implements OnInit {
 
     if (!dataJson) {
       /* load from API data */
-      this.apiService.loadCurrency().subscribe(
+      this.subscription = this.apiService.loadCurrency()
+        .pipe(
+          tap(data => [data][0])
+        ).subscribe(
           (result: NbuCurrenciesInterface[]) => {
             this.currencyMap = this.currencyService.setCurrencyMap(result);
             localStorage.setItem('currency_' + dateToday, JSON.stringify(Object.fromEntries(this.currencyMap)));
@@ -46,4 +50,7 @@ export class AppComponent implements OnInit {
     }
   }
 
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
 }

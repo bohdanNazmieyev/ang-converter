@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { first, Observable, tap } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,9 +11,6 @@ export class NbuApiService {
   constructor(private _http: HttpClient) { }
 
   loadCurrency(): Observable<any> {
-    return this._http.get(this.apiUrlJson).pipe(
-      tap(data => [data][0]),
-      first()
-      );
+    return this._http.get(this.apiUrlJson);
   }
 }
