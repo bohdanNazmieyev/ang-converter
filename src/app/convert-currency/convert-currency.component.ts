@@ -75,7 +75,6 @@ export class ConvertCurrencyComponent implements OnInit {
     }
   }
 
-
   calculateFromTo(giveValue = 0, take = 1, give = 1){
     if (give === 1) {
       this.calculateFromHrn(giveValue, take, this.convertForm);
